@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.travelbuddy.post.entities.Post;
-import com.travelbuddy.post.exception.DuplicatePostException;
 import com.travelbuddy.post.exception.PostNotExistException;
 import com.travelbuddy.post.service.PostService;
 
@@ -33,14 +32,14 @@ public class PostController
 	@GetMapping("/all")
 	public List<Post> retrieveAllPosts()
 	{
-		log.info("Request received for get all Post ");	
+		log.info("Request received to get all Post ");	
 		return service.getAllPosts();
 	}
 	
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<?> removePost(@PathVariable String id)
 	{
-		log.info("Request received for delete Post with id: {}",id);	
+		log.info("Request received to delete Post with id: {}",id);	
 		try 
 		{
 			service.deletePost(id);
@@ -55,23 +54,17 @@ public class PostController
 	@PostMapping("/createpost")
 	public ResponseEntity<?> generatePost(@RequestBody Post post)
 	{
-		log.info("Request received for create a Post");	
-		try
-		{
+		log.info("Request received to create a Post");	
+
 		   return new ResponseEntity<>(service.createPost(post),HttpStatus.OK);	
-		}
-		catch(DuplicatePostException duplicatePostException)
-		{
-		  return new ResponseEntity<>(duplicatePostException.getMessage(),HttpStatus.CONFLICT);  	
-		}
-		
+
 		
 	}
 	
 	@PutMapping("/update/{id}")
 	public ResponseEntity<?> renovatePost(@PathVariable String id,@RequestBody Post post)
 	{
-	        log.info("Request received for update Post with id: {}",id);	
+	        log.info("Request received to update Post with id: {}",id);	
 		    try
 		    {
 			 return new ResponseEntity<>(service.updatePost(id,post),HttpStatus.OK);

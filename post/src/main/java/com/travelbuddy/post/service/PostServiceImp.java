@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.travelbuddy.post.entities.Post;
-import com.travelbuddy.post.exception.DuplicatePostException;
 import com.travelbuddy.post.exception.PostNotExistException;
 import com.travelbuddy.post.repository.PostRepository;
 
@@ -19,17 +18,11 @@ public class PostServiceImp implements PostService
 	private PostRepository repository;
 	
 	@Override
-	public Post createPost(Post post) throws DuplicatePostException
+	public Post createPost(Post post)
 	{
 		// TODO Auto-generated method stub
-		//return repository.save(post);
-		Optional<Post> postDetails =repository.findById(post.getId());
-		if(!postDetails.isEmpty())
-		{
-			throw new DuplicatePostException("Post Already Exists,choose different id");
-		}
-		repository.save(post);
-		return post;
+		return repository.save(post);
+
 	}
 
 	@Override
