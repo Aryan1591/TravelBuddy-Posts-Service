@@ -1,6 +1,6 @@
 package com.travelbuddy.post.entities;
 
-import com.travelbuddy.post.constants.Constants.Status;
+import com.travelbuddy.post.constants.Constants;
 import com.travelbuddy.post.model.Count;
 import com.travelbuddy.post.model.TimelineEntry;
 import lombok.AllArgsConstructor;
@@ -15,11 +15,10 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document
-public class Post {
-
+@Document(collection = "travelbuddy.inactivePosts")
+public class InactivePosts {
     @Id
-    private String id; // serves as PostId and ChatId
+    private String id;
     private String title;
     private String source;
     private String destination;
@@ -29,5 +28,5 @@ public class Post {
     private List<TimelineEntry> events;
     private Double amount;
     private List<String> users;
-    private Status status;
+    private Constants.Status status;
 }
