@@ -6,6 +6,7 @@ import com.travelbuddy.post.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,13 +20,23 @@ public class PostController {
     private PostService service;
 
 
-    @GetMapping("/all")
-    public List<Post> retrieveAllPosts() {
+    @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Post>> retrieveAllPosts() {
         log.info("Request received to get all Post ");
-        return service.getAllPosts();
+        return ResponseEntity.ok(service.getAllPosts());
     }
 
-    @DeleteMapping("/{id}")
+    @RequestMapping(value = "/{postId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> retrievePost(@PathVariable String postId) {
+        log.info("Request received to get post for id {}", postId);
+        try {
+            return ResponseEntity.ok(service.getPostById(postId));
+        } catch (PostNotExistException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<?> removePost(@PathVariable String id) {
         log.info("Request received to delete Post with id: {}", id);
         try {
@@ -36,16 +47,16 @@ public class PostController {
         }
     }
 
-    @PostMapping("/createpost")
+    @RequestMapping(value = "/createPost",
+            consumes = "application/json",
+            produces = "application/json",
+            method = RequestMethod.POST)
     public ResponseEntity<?> generatePost(@RequestBody Post post) {
         log.info("Request received to create a Post");
-
         return new ResponseEntity<>(service.createPost(post), HttpStatus.OK);
-
-
     }
 
-    @PutMapping("/update/{id}")
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public ResponseEntity<?> renovatePost(@PathVariable String id, @RequestBody Post post) {
         log.info("Request received to update Post with id: {}", id);
         try {
@@ -55,7 +66,7 @@ public class PostController {
         }
     }
 
-    @DeleteMapping("/removeUser/{username}/{postId}")
+    @RequestMapping(value = "/removeUser/{username}/{postId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> removeUserFromPost(@PathVariable String username, @PathVariable String postId) {
         log.info("Request received to remove user {} from post {}", username, postId);
         try {
@@ -65,7 +76,7 @@ public class PostController {
         }
     }
 
-    @PutMapping("/updateStatusToInactive/{id}")
+    @RequestMapping(value = "/updateStatusToInactive/{id}", method = RequestMethod.PUT)
     public ResponseEntity<?> updateStatusToInactive(@PathVariable String postId) {
         log.info("Updating Status To Inactive for id {}", postId);
         try {
@@ -75,7 +86,7 @@ public class PostController {
         }
     }
 
-    @PutMapping("/updateStatusToLocked/{id}")
+    @RequestMapping(value = "/updateStatusToLocked/{id}", method = RequestMethod.PUT)
     public ResponseEntity<?> updateStatusToLocked(@PathVariable String postId) {
         log.info("Updating Status To Locked for id {}", postId);
         try {
