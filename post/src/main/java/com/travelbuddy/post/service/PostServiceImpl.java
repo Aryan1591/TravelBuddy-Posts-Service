@@ -3,8 +3,11 @@ package com.travelbuddy.post.service;
 import com.travelbuddy.post.constants.Constants;
 import com.travelbuddy.post.entities.Post;
 import com.travelbuddy.post.exception.PostNotExistException;
+import com.travelbuddy.post.feign.ChatServiceFeignClient;
+import com.travelbuddy.post.feign.UserServiceFeignClient;
 import com.travelbuddy.post.model.Count;
 import com.travelbuddy.post.repository.PostRepository;
+import com.travelbuddy.post.utils.EventsFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -30,12 +34,15 @@ public class PostServiceImpl implements PostService {
     private MongoTemplate mongoTemplate;
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private UserServiceFeignClient userServiceFeignClient;
+    @Autowired
+    private ChatServiceFeignClient chatServiceFeignClient;
 
     @Override
     public Post createPost(Post post) {
-        // TODO Auto-generated method stub
         post.setStatus(Constants.Status.ACTIVE);
-        String gender = restTemplate.getForObject("http://USER-MICROSERVICE/users/gender/" + post.getAdminName(), String.class);
+        String gender = userServiceFeignClient.getGenderFromUsername(post.getAdminName());
         Count count = new Count(0, 0, 0);
         if ("Male".equals(gender)) {
             count.setMaleCount(1);
@@ -46,7 +53,10 @@ public class PostServiceImpl implements PostService {
         }
         post.setCount(count);
         post.getUsers().add(post.getAdminName());
-        return postRepository.save(post);
+        Post savedPost = postRepository.save(post);
+        chatServiceFeignClient.buildChatRoom(savedPost.getId());
+        userServiceFeignClient.addPostIdToUserBucket(post.getAdminName(), savedPost.getId());
+        return savedPost;
     }
 
     @Override
@@ -55,7 +65,7 @@ public class PostServiceImpl implements PostService {
         if (currentPost.isEmpty()) throw new PostNotExistException("Post doesn't exist");
         currentPost.get().setUsers(currentPost.get().getUsers().stream()
                 .filter(usernames -> !usernames.equals(username)).collect(Collectors.toList()));
-        String gender = restTemplate.getForObject("http://USER-MICROSERVICE/users/gender/" + username, String.class);
+        String gender = userServiceFeignClient.getGenderFromUsername(username);
         if ("Male".equals(gender))
             currentPost.get().getCount().setMaleCount(currentPost.get().getCount().getMaleCount() - 1);
         else if ("Female".equals(gender)) {
@@ -89,12 +99,41 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post updatePost(String id, Post post) throws PostNotExistException {
-        // TODO Auto-generated method stub
-        if (!postRepository.existsById(id)) {
-            throw new PostNotExistException("the Post Doesn't Exits,Please check the id: " + id);
+    public String addUserToPost(final String username, final String postId) {
+        Post existingPost = postRepository.findById(postId).orElse(null);
+        if (null == existingPost)
+            throw new PostNotExistException("Post doesn't exist");
+        List<String> existingMembers = existingPost.getUsers();
+        existingMembers.add(username);
+        existingPost.setUsers(existingMembers);
+        /*
+           TODO
+           Assuming user always exists , need to handle exceptions later
+         */
+        String gender = userServiceFeignClient.getGenderFromUsername(username);
+        if ("Male".equals(gender)) {
+            existingPost.getCount().setMaleCount(existingPost.getCount().getMaleCount() + 1);
+        } else if ("Female".equals(gender)) {
+            existingPost.getCount().setFemaleCount(existingPost.getCount().getFemaleCount() + 1);
+        } else {
+            existingPost.getCount().setOtherCount(existingPost.getCount().getOtherCount() + 1);
         }
-        return postRepository.save(post);
+        postRepository.save(existingPost);
+        return "User has been successfully added";
+    }
+
+    @Override
+    public Post updatePost(String id, Post updatedPost) throws PostNotExistException {
+        // TODO Auto-generated method stub
+        Post existingPost = postRepository.findById(id).orElse(null);
+        if (Objects.isNull(existingPost)) {
+            throw new PostNotExistException("This post doesn't exists,please check the id: " + id);
+        }
+        //filter the events since dates got changed
+        if ((!updatedPost.getStartDate().equals(existingPost.getStartDate())) || (!updatedPost.getEndDate().equals(existingPost.getEndDate()))) {
+            updatedPost.setEvents(EventsFilter.filterEvents(updatedPost.getStartDate(), updatedPost.getEndDate(), updatedPost.getEvents()));
+        }
+        return postRepository.save(updatedPost);
     }
 
     @Override
@@ -106,7 +145,6 @@ public class PostServiceImpl implements PostService {
         }
         mongoTemplate.save(post.get(), deletedPostsCollection);
         postRepository.deleteById(id);
-
     }
 
     @Override
