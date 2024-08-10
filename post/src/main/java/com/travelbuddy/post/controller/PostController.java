@@ -68,9 +68,19 @@ public class PostController {
 
     @RequestMapping(value = "/removeUser/{username}/{postId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> removeUserFromPost(@PathVariable String username, @PathVariable String postId) {
-        log.info("Request received to remove user {} from post {}", username, postId);
+        log.info("Request received to remove user {} from postId {}", username, postId);
         try {
             return new ResponseEntity<>(service.removeUserFromPost(username, postId), HttpStatus.OK);
+        } catch (PostNotExistException postNotExistException) {
+            return new ResponseEntity<>(postNotExistException.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/addUser/{username}/{postId}", method = RequestMethod.POST)
+    public ResponseEntity<?> addUser(@PathVariable String username, @PathVariable String postId) {
+        log.info("Request received to add user {} to postId {}", username, postId);
+        try {
+            return new ResponseEntity<>(service.addUserToPost(username, postId), HttpStatus.OK);
         } catch (PostNotExistException postNotExistException) {
             return new ResponseEntity<>(postNotExistException.getMessage(), HttpStatus.NOT_FOUND);
         }

@@ -1,6 +1,5 @@
 package com.travelbuddy.post.entities;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.travelbuddy.post.constants.Constants.Status;
 import com.travelbuddy.post.model.Count;
 import com.travelbuddy.post.model.TimelineEntry;
@@ -10,7 +9,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +23,8 @@ public class Post {
     private String title;
     private String source;
     private String destination;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private String startDate;
+    private String endDate;
     private Count count;
     private List<TimelineEntry> events = new ArrayList<>();
     private Double amount;

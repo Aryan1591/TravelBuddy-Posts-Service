@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: PostService
+  data:
+    mongodb:
+      uri: mongodb+srv://deva:deva123@atlascluster.inazn0l.mongodb.net/?retryWrites=true&w=majority&appName=AtlasCluster
+      database: TravelBuddy
+server:
+  port: 8093
+
+travelbuddy:
+  collection:
+    posts: travelbuddy.posts
+  deletedPostsCollection: travelbuddy.deletedPosts
+  inactivePostsCollection: travelbuddy.inactivePosts
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    registry-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka

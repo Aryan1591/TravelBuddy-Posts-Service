@@ -22,4 +22,6 @@ public interface PostService {
 
     Post updateStatusToLocked(String postId);
 
+    String addUserToPost(String username, String postId);
+
 }
