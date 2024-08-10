@@ -10,9 +10,9 @@ server:
 
 travelbuddy:
   collection:
-    posts: travelbuddy.posts
-  deletedPostsCollection: travelbuddy.deletedPosts
-  inactivePostsCollection: travelbuddy.inactivePosts
+    posts: Posts
+  deletedPostsCollection: DeletedPosts
+  inactivePostsCollection: InactivePosts
 
 eureka:
   instance:
