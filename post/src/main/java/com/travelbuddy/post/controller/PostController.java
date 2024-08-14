@@ -9,12 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,6 +17,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping("/post")
+@CrossOrigin(origins = "http://localhost:5173")
 public class PostController {
 
     @Autowired
@@ -35,8 +31,8 @@ public class PostController {
     }
 
     @RequestMapping(value = "/allPosts", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<Post>> retrieveAllPosts(@RequestParam (defaultValue = "0") int page,
-                                                       @RequestParam (defaultValue = "5") int size) {
+    public ResponseEntity<Page<Post>> retrieveAllPosts(@RequestParam(defaultValue = "0") int page,
+                                                       @RequestParam(defaultValue = "5") int size) {
         log.info("Request received to get all Post ");
         return ResponseEntity.ok(postService.getAllPosts(page, size));
     }
@@ -108,20 +104,20 @@ public class PostController {
     }
 
     @RequestMapping(value = "/updateStatusToInactive/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateStatusToInactive(@PathVariable String postId) {
-        log.info("Updating Status to Inactive for id {}", postId);
+    public ResponseEntity<?> updateStatusToInactive(@PathVariable String id) {
+        log.info("Updating Status to Inactive for id {}", id);
         try {
-            return new ResponseEntity<>(postService.updateStatusToInactiveAndMoveToInactiveCollection(postId), HttpStatus.OK);
+            return new ResponseEntity<>(postService.updateStatusToInactiveAndMoveToInactiveCollection(id), HttpStatus.OK);
         } catch (PostNotExistException postNotExistException) {
             return new ResponseEntity<>(postNotExistException.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 
     @RequestMapping(value = "/updateStatusToLocked/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateStatusToLocked(@PathVariable String postId) {
-        log.info("Updating Status to Locked for id {}", postId);
+    public ResponseEntity<?> updateStatusToLocked(@PathVariable String id) {
+        log.info("Updating Status to Locked for id {}", id);
         try {
-            return new ResponseEntity<>(postService.updateStatusToLocked(postId), HttpStatus.OK);
+            return new ResponseEntity<>(postService.updateStatusToLocked(id), HttpStatus.OK);
         } catch (PostNotExistException postNotExistException) {
             return new ResponseEntity<>(postNotExistException.getMessage(), HttpStatus.NOT_FOUND);
         }
