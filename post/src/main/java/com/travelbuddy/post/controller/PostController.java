@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping("/post")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "https://coruscating-gaufre-9c3549.netlify.app")
 public class PostController {
 
     @Autowired
