@@ -21,4 +21,4 @@ eureka:
     fetch-registry: true
     registry-with-eureka: true
     service-url:
-      defaultZone: https://travelbuddy-servicediscovery-production.up.railway.app/
+      defaultZone: https://travelbuddy-servicediscovery-production.up.railway.app/eureka/
