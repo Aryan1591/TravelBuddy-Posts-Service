@@ -15,8 +15,8 @@ travelbuddy:
   inactivePostsCollection: InactivePosts
 
 eureka:
-  instance:
-    prefer-ip-address: true
+  # instance:
+  #   prefer-ip-address: true
   client:
     fetch-registry: true
     registry-with-eureka: true
