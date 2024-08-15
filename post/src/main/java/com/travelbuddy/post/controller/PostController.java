@@ -2,6 +2,7 @@ package com.travelbuddy.post.controller;
 
 import com.travelbuddy.post.entities.Post;
 import com.travelbuddy.post.exception.PostNotExistException;
+import com.travelbuddy.post.feign.UserServiceFeignClient;
 import com.travelbuddy.post.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -22,7 +24,10 @@ public class PostController {
 
     @Autowired
     private PostService postService;
-
+    @Autowired
+    private UserServiceFeignClient userServiceFeignClient;
+    @Autowired
+    private RestTemplate restTemplate;
 
     @RequestMapping(value = "/getPostsCount", method = RequestMethod.GET)
     public ResponseEntity<Long> getPostsCount() {
@@ -123,4 +128,18 @@ public class PostController {
         }
     }
 
+    @RequestMapping(value = "/test/{username}", method = RequestMethod.GET)
+    public String testUsername(@PathVariable String username) {
+        try{
+//            String url = "https://travelbuddy-user-service-production.up.railway.app/users/gender/{username}";
+//            ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class, username);
+//
+//
+//            return responseEntity.getBody();
+//            return userServiceFeignClient.getGenderFromUsername(username);
+           return userServiceFeignClient.getGenderFromUsername(username);
+        } catch (Exception e) {
+            return "Still the problem in calling another microservice";
+        }
+    }
 }

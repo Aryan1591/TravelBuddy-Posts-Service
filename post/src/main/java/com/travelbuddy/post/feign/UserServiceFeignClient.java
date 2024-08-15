@@ -3,10 +3,10 @@ package com.travelbuddy.post.feign;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "UserService")
+@FeignClient(name = "UserService",url = "https://travelbuddy-user-service-production.up.railway.app")
 public interface UserServiceFeignClient {
 
-    @GetMapping("/users/gender/{username}")
+    @RequestMapping(value = "/users/gender/{username}", method = RequestMethod.GET)
     public String getGenderFromUsername(@PathVariable String username);
 
     @PostMapping("/userPosts/{username}/posts/add")
