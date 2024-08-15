@@ -5,6 +5,7 @@ spring:
     mongodb:
       uri: mongodb+srv://deva:deva123@atlascluster.inazn0l.mongodb.net/?retryWrites=true&w=majority&appName=AtlasCluster
       database: TravelBuddy
+
 server:
   port: 8080
 
@@ -15,10 +16,8 @@ travelbuddy:
   inactivePostsCollection: InactivePosts
 
 eureka:
-  # instance:
-  #   prefer-ip-address: true
   client:
     fetch-registry: true
-    registry-with-eureka: true
+    register-with-eureka: true
     service-url:
       defaultZone: https://travelbuddy-servicediscovery-production.up.railway.app/eureka/
